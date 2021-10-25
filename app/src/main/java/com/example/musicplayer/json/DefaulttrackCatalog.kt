@@ -11,6 +11,7 @@ import android.support.v4.media.MediaMetadataCompat.*
 import androidx.core.net.toUri
 import com.example.musicplayer.R
 import com.example.musicplayer.recycler.MusicItem
+import com.example.musicplayer.service.Song
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -32,9 +33,10 @@ class DefaultTrackCatalog @Inject constructor(
         initCatalogFromJson()
     }
 
-    private var songs = emptyList<MediaMetadataCompat>()
+    var songs = emptyList<MediaMetadataCompat>()
     private var _catalog: List<MusicItem>? = null
     private val catalog: List<MusicItem> get() = requireNotNull(_catalog)
+
 
     private fun initCatalogFromJson() {
         val moshi = Moshi.Builder()
@@ -52,18 +54,35 @@ class DefaultTrackCatalog @Inject constructor(
 
     override fun getTrackCatalog() = catalog
 
-    fun getSpecialCatalog(): ConcatenatingMediaSource {
+    override fun getSpecialCatalog() {
         songs = catalog.map { song ->
             MediaMetadataCompat.Builder().putString(METADATA_KEY_ARTIST, song.artist)
                 .putString(METADATA_KEY_TITLE, song.title)
                 .putString(METADATA_KEY_DISPLAY_TITLE, song.title)
                 .putString(METADATA_KEY_DISPLAY_ICON_URI, song.bitmapUri)
                 .putString(METADATA_KEY_MEDIA_URI, song.trackUri)
-                .putString(METADATA_KEY_MEDIA_ID, catalog.indexOf(song).toString())
+                .putString(METADATA_KEY_MEDIA_ID, song.title)
                 .putString(METADATA_KEY_DISPLAY_SUBTITLE, song.artist)
                 .putString(METADATA_KEY_DISPLAY_DESCRIPTION, song.artist)
                 .build()
         }
+    }
+
+    override fun getSongsList(): List<MediaMetadataCompat> {
+        return songs
+    }
+
+    override fun getSpecialSongsList(): List<Song> {
+        return songs.map { Song(
+            it.description.mediaId.toString(),
+            it.description.title.toString(),
+            it.description.subtitle.toString(),
+            it.description.iconUri.toString(),
+            it.description.mediaUri.toString()
+        ) }
+    }
+
+    override fun asMediaSource(): ConcatenatingMediaSource {
         val concatenatingMediaSource = ConcatenatingMediaSource()
         songs.forEach { song ->
 
@@ -91,7 +110,7 @@ class DefaultTrackCatalog @Inject constructor(
         return concatenatingMediaSource
     }
 
-    override fun createMediaItems(): List<MediaBrowserCompat.MediaItem> {
+    override fun createMediaItems(): MutableList<MediaBrowserCompat.MediaItem> {
         val list = songs.map { song ->
             val desc = MediaDescriptionCompat.Builder()
                 .setMediaUri(song.getString(METADATA_KEY_MEDIA_URI).toUri())
@@ -101,7 +120,7 @@ class DefaultTrackCatalog @Inject constructor(
                 .build()
             MediaBrowserCompat.MediaItem(desc, FLAG_PLAYABLE)
         }
-        return list
+        return list.toMutableList()
     }
 
 }

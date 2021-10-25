@@ -5,8 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.musicplayer.MusicListener
 import com.example.musicplayer.databinding.ItemBinding
+import com.example.musicplayer.service.Song
 
-class MusicAdapter(private val listener:MusicListener) : ListAdapter<MusicItem, MusicItemViewHolder>(MusicDiffCallback()) {
+class MusicAdapter(private val listener: MusicListener) :
+    ListAdapter<Song, MusicItemViewHolder>(MusicDiffCallback()) {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)

@@ -1,13 +1,14 @@
 package com.example.musicplayer.recycler
 
 import androidx.recyclerview.widget.DiffUtil
+import com.example.musicplayer.service.Song
 
-class MusicDiffCallback : DiffUtil.ItemCallback<MusicItem>() {
-    override fun areItemsTheSame(oldItem: MusicItem, newItem: MusicItem): Boolean {
+class MusicDiffCallback : DiffUtil.ItemCallback<Song>() {
+    override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
         return oldItem.title == newItem.title
     }
 
-    override fun areContentsTheSame(oldItem: MusicItem, newItem: MusicItem): Boolean {
-        return oldItem.artist == newItem.artist && oldItem.title == newItem.title && oldItem.duration == newItem.duration
+    override fun areContentsTheSame(oldItem: Song, newItem: Song): Boolean {
+        return oldItem.artist == newItem.artist && oldItem.title == newItem.title
     }
 }

@@ -14,7 +14,7 @@ class MusicPlayerListener(private val musicService: MusicService) :
     override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
         super.onNotificationCancelled(notificationId, dismissedByUser)
         musicService.stopForeground(true)
-        musicService.isForeground = false
+        musicService.forground = false
         musicService.stopSelf()
     }
 
@@ -25,14 +25,14 @@ class MusicPlayerListener(private val musicService: MusicService) :
     ) {
         super.onNotificationPosted(notificationId, notification, ongoing)
         musicService.apply {
-            if (ongoing && isForeground) {
+            if (ongoing && forground) {
                 ContextCompat.startForegroundService(
                     this,
                     Intent(applicationContext, this::class.java)
                 )
             }
             startForeground(NOTIFICATION_ID, notification)
-            isForeground = true
+            forground = true
         }
     }
 }

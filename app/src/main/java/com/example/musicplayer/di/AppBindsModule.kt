@@ -18,7 +18,7 @@ interface AppBindsModule {
 
     @Binds
     @Singleton
-    fun bindTrackCatalog(trackCatalog: DefaultTrackCatalog): TrackCatalog
+    fun bindDefaultTrackCatalog(defaultTrackCatalog: DefaultTrackCatalog): TrackCatalog
 
     @Binds
     @Singleton

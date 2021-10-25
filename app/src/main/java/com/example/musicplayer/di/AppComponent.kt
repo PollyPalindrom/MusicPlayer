@@ -2,7 +2,9 @@ package com.example.musicplayer.di
 
 import android.app.Application
 import com.example.musicplayer.MainActivity
+import com.example.musicplayer.ViewModelFactory
 import com.example.musicplayer.service.MusicService
+import com.example.musicplayer.ui.main.MainFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -11,7 +13,9 @@ import javax.inject.Singleton
 @Singleton
 interface AppComponent {
 
-    fun inject(mainActivity: MainActivity)
+    fun viewModelsFactory(): ViewModelFactory
+
+    fun inject(mainFragment: MainFragment)
     fun inject(musicService: MusicService)
 
     @Component.Builder

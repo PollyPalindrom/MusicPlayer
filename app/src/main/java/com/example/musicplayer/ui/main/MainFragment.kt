@@ -1,29 +1,43 @@
 package com.example.musicplayer.ui.main
 
+import android.os.Build
 import android.os.Bundle
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.musicplayer.DownloadListener
 import com.example.musicplayer.MusicListener
+import com.example.musicplayer.R
+import com.example.musicplayer.appComponent
 import com.example.musicplayer.databinding.MainFragmentBinding
+import com.example.musicplayer.player.isPlaying
 import com.example.musicplayer.recycler.MusicAdapter
+import com.example.musicplayer.service.Song
+import com.example.musicplayer.viewPager.SwipeAdapter
 import java.net.URL
 
-class MainFragment(private val listener: MusicListener) : Fragment() {
+class MainFragment() : Fragment(), MusicListener {
 
     companion object {
-        fun newInstance(listener: MusicListener): MainFragment {
-            return MainFragment(listener)
-        }
+        fun newInstance(listener: MusicListener) = MainFragment()
     }
 
-    private val musicAdapter: MusicAdapter = MusicAdapter(listener)
+    private val swipeAdapter: SwipeAdapter = SwipeAdapter()
+    private val musicAdapter: MusicAdapter = MusicAdapter(this)
     private lateinit var binding: MainFragmentBinding
-    private lateinit var viewModel: MainViewModel
+    private var currentSong: Song? = null
+    private var playbackState: PlaybackStateCompat? = null
+    private val viewModel: MainViewModel by viewModels {
+        requireActivity().appComponent.viewModelsFactory()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,17 +47,66 @@ class MainFragment(private val listener: MusicListener) : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        musicAdapter.submitList(listener.getTracks())
+        binding.viewPager.adapter = swipeAdapter
         binding.musicRecycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = musicAdapter
         }
+        viewModel.songs.observe(viewLifecycleOwner) {
+            musicAdapter.submitList(it)
+        }
+        viewModel.songs.observe(viewLifecycleOwner) {
+            swipeAdapter.submitList(it)
+            swipe(currentSong ?: return@observe)
+        }
+        viewModel.playingSong.observe(viewLifecycleOwner) {
+            if (it == null) {
+                return@observe
+            }
+            currentSong = Song(
+                it.description.mediaId.toString(),
+                it.description.title.toString(),
+                it.description.subtitle.toString(),
+                it.description.iconUri.toString(),
+                it.description.mediaUri.toString()
+            )
+            swipe(currentSong ?: return@observe)
+        }
+        viewModel.playbackState.observe(viewLifecycleOwner) {
+            playbackState = it
+            if (playbackState?.isPlaying == true) binding.playingOrNot.setImageResource(R.drawable.ic_baseline_pause_50)
+            else binding.playingOrNot.setImageResource(R.drawable.ic_baseline_play_arrow_50)
+        }
+        binding.viewPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    if (playbackState?.isPlaying == true) {
+                        viewModel.playOrToggle(swipeAdapter.currentList[position])
+                    } else {
+                        currentSong = swipeAdapter.currentList[position]
+                    }
+                }
+            }
+        )
+        binding.playingOrNot.setOnClickListener {
+            currentSong?.let {
+                viewModel.playOrToggle(it, true)
+            }
+        }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        listener.release()
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun playOrToggle(song: Song) {
+        viewModel.playOrToggle(song)
     }
 
+    private fun swipe(song: Song) {
+        val newIndex = swipeAdapter.getItemPosition(song)
+        if (newIndex != -1) {
+            binding.viewPager.currentItem = newIndex
+        }
+    }
 }

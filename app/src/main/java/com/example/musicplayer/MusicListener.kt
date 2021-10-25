@@ -2,9 +2,8 @@ package com.example.musicplayer
 
 import com.example.musicplayer.player.MediaPlayer
 import com.example.musicplayer.recycler.MusicItem
+import com.example.musicplayer.service.Song
 
 interface MusicListener {
-    fun getTracks(): List<MusicItem>
-    fun play(url: String)
-    fun release()
+    fun playOrToggle(song: Song)
 }

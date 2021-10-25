@@ -3,8 +3,10 @@ package com.example.musicplayer.di
 import android.app.Application
 import android.content.Context
 import android.content.res.AssetManager
+import com.example.musicplayer.connector.MusicConnector
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class AppModule {
@@ -15,4 +17,7 @@ class AppModule {
     @Provides
     fun provideAssetManager(app: Application): AssetManager = app.assets
 
+    @Provides
+    @Singleton
+    fun provideMusicConnector(context: Context) = MusicConnector(context)
 }
