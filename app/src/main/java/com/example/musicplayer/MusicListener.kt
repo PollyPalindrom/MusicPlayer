@@ -6,4 +6,5 @@ import com.example.musicplayer.service.Song
 
 interface MusicListener {
     fun playOrToggle(song: Song)
+    fun createFullScreenFragment()
 }

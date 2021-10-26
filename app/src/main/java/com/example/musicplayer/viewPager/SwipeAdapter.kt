@@ -3,11 +3,13 @@ package com.example.musicplayer.viewPager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import com.example.musicplayer.MainListener
+import com.example.musicplayer.MusicListener
 import com.example.musicplayer.databinding.SwipeItemBinding
 import com.example.musicplayer.recycler.MusicDiffCallback
 import com.example.musicplayer.service.Song
 
-class SwipeAdapter() :
+class SwipeAdapter(private val listener: MusicListener) :
     ListAdapter<Song, SwipeViewHolder>(MusicDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwipeViewHolder {
@@ -17,7 +19,7 @@ class SwipeAdapter() :
     }
 
     override fun onBindViewHolder(holder: SwipeViewHolder, position: Int) {
-        getItem(position)?.let { holder.bind(it) }
+        getItem(position)?.let { holder.bind(it, listener) }
     }
 
     fun getItemPosition(song: Song): Int {

@@ -6,31 +6,22 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.example.musicplayer.DownloadListener
-import com.example.musicplayer.MusicListener
-import com.example.musicplayer.R
-import com.example.musicplayer.appComponent
+import com.example.musicplayer.*
 import com.example.musicplayer.databinding.MainFragmentBinding
+import com.example.musicplayer.fullScreen.FullScreenFragment
 import com.example.musicplayer.player.isPlaying
 import com.example.musicplayer.recycler.MusicAdapter
 import com.example.musicplayer.service.Song
 import com.example.musicplayer.viewPager.SwipeAdapter
-import java.net.URL
 
-class MainFragment() : Fragment(), MusicListener {
+class MainFragment : Fragment(), MusicListener {
 
-    companion object {
-        fun newInstance(listener: MusicListener) = MainFragment()
-    }
-
-    private val swipeAdapter: SwipeAdapter = SwipeAdapter()
+    private lateinit var swipeAdapter: SwipeAdapter
     private val musicAdapter: MusicAdapter = MusicAdapter(this)
     private lateinit var binding: MainFragmentBinding
     private var currentSong: Song? = null
@@ -49,6 +40,7 @@ class MainFragment() : Fragment(), MusicListener {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        swipeAdapter = SwipeAdapter(this)
         binding.viewPager.adapter = swipeAdapter
         binding.musicRecycler.apply {
             layoutManager = LinearLayoutManager(context)
@@ -101,6 +93,13 @@ class MainFragment() : Fragment(), MusicListener {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun playOrToggle(song: Song) {
         viewModel.playOrToggle(song)
+    }
+
+    override fun createFullScreenFragment() {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.container, FullScreenFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun swipe(song: Song) {
