@@ -35,7 +35,7 @@ class MusicService : MediaBrowserServiceCompat() {
     private lateinit var playerEventListener: PlayerEventListener
     private lateinit var musicNotificationManager: MusicNotificationManager
     var forground = false
-    private var playing: MediaMetadataCompat? = null
+    var playing: MediaMetadataCompat? = null
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private var initialized = false
@@ -60,7 +60,7 @@ class MusicService : MediaBrowserServiceCompat() {
             }
         val musicPlaybackPreparer = MusicPlaybackPreparer(defaultTrackCatalog) {
             playing = it
-            it?.let { it1 -> preparePLayer(defaultTrackCatalog.getSongsList(), it1, true) }
+            preparePLayer(defaultTrackCatalog.getSongsList(), it, true)
         }
         mediaSessionConnector = MediaSessionConnector(mediaSession)
         mediaSessionConnector.setPlaybackPreparer(musicPlaybackPreparer)
@@ -73,15 +73,12 @@ class MusicService : MediaBrowserServiceCompat() {
 
     private fun preparePLayer(
         songs: List<MediaMetadataCompat>,
-        itemToPlay: MediaMetadataCompat,
+        itemToPlay: MediaMetadataCompat?,
         playNow: Boolean
     ) {
-        var currentSong = 0
-        if (playing != null) {
-            currentSong = songs.indexOf(itemToPlay)
-        }
+        val curSongIndex = if (playing == null) 0 else songs.indexOf(itemToPlay)
         exoPlayer.prepare(defaultTrackCatalog.asMediaSource())
-        exoPlayer.seekTo(currentSong, 0L)
+        exoPlayer.seekTo(curSongIndex, 0L)
         exoPlayer.playWhenReady = playNow
     }
 

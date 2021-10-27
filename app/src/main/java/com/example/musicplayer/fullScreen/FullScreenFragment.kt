@@ -47,11 +47,7 @@ class FullScreenFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (currentSong == null) {
-            currentSong = mainViewModel.songs.value?.get(0)
-            currentSong?.let { update(it) }
-        }
-        mainViewModel.playingSong.observe(viewLifecycleOwner) {
+        viewModel.curPlayingSong.observe(viewLifecycleOwner) {
             if (it == null) return@observe
             currentSong = Song(
                 it.description.mediaId.toString(),
@@ -64,16 +60,16 @@ class FullScreenFragment : Fragment() {
         }
         binding.stopOrPlay.setOnClickListener {
             currentSong?.let {
-                mainViewModel.playOrToggle(it, true)
+                viewModel.playOrToggle(it, true)
             }
         }
         binding.prevSong.setOnClickListener {
-            mainViewModel.skipToPrevSong()
+            viewModel.skipToPreviousSong()
         }
         binding.nextSong.setOnClickListener {
-            mainViewModel.skipToNextSong()
+            viewModel.skipToNextSong()
         }
-        mainViewModel.playbackState.observe(viewLifecycleOwner) {
+        viewModel.playbackState.observe(viewLifecycleOwner) {
             playbackState = it
             if (playbackState?.isPlaying == true) binding.stopOrPlay.setImageResource(R.drawable.ic_baseline_pause_50)
             else binding.stopOrPlay.setImageResource(R.drawable.ic_baseline_play_arrow_50)
