@@ -12,7 +12,6 @@ import androidx.core.net.toUri
 import com.example.musicplayer.R
 import com.example.musicplayer.recycler.MusicItem
 import com.example.musicplayer.service.Song
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -97,13 +96,7 @@ class DefaultTrackCatalog @Inject constructor(
                     )
                 )
                     .createMediaSource(
-                        MediaItem.fromUri(
-                            Uri.parse(
-                                song.getString(
-                                    METADATA_KEY_MEDIA_URI
-                                )
-                            )
-                        )
+                        song.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI).toUri()
                     )
             concatenatingMediaSource.addMediaSource(mediaSource)
         }

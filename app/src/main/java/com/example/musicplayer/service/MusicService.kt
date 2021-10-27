@@ -80,8 +80,7 @@ class MusicService : MediaBrowserServiceCompat() {
         if (playing != null) {
             currentSong = songs.indexOf(itemToPlay)
         }
-        exoPlayer.setMediaSource(defaultTrackCatalog.asMediaSource())
-        exoPlayer.prepare()
+        exoPlayer.prepare(defaultTrackCatalog.asMediaSource())
         exoPlayer.seekTo(currentSong, 0L)
         exoPlayer.playWhenReady = playNow
     }

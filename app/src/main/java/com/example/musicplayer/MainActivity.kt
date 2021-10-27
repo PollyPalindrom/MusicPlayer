@@ -2,16 +2,7 @@ package com.example.musicplayer
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
-import com.example.musicplayer.fullScreen.FullScreenFragment
-import com.example.musicplayer.json.DefaultTrackCatalog
-import com.example.musicplayer.json.TrackCatalog
-import com.example.musicplayer.player.MediaPlayer
-import com.example.musicplayer.recycler.MusicItem
-import com.example.musicplayer.res.AppResources
-import com.example.musicplayer.service.Song
 import com.example.musicplayer.ui.main.MainFragment
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
